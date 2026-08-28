@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="Core/Store.Domain/Store.Domain.csproj" />
+    <Project Path="Core/Store.Services.Abstractions/Store.Services.Abstractions.csproj" />
+    <Project Path="Core/Store.Services/Store.Services.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Infrastructure/Store.Persistance/Store.Persistance.csproj" />
+    <Project Path="Infrastructure/Store.Presentation.API/Store.Presentation.API.csproj" />
+  </Folder>
+  <Project Path="Store.Shared/Store.Shared.csproj" />
+  <Project Path="Store.Web/Store.Web.csproj" />
+</Solution>

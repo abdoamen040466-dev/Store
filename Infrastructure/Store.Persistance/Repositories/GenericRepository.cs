@@ -25,7 +25,7 @@ public class GenericRepository<TKey, TEntity>(StoreDbContext _context) : IGeneri
     {
         if (typeof(TEntity) == typeof(Product))
         {
-            return await _context.Products.Include(p => p.Type).Include(p => p.Brand).FirstOrDefaultAsync(p => p.Id == key as int?) as TEntity;
+            return await _context.Products.Include(p => p.Type).Include(p => p.Brand).Where(p => p.Id == key as int?).FirstOrDefaultAsync() as TEntity;
         }
         return await _context.Set<TEntity>().FindAsync(key);
     }
@@ -43,5 +43,24 @@ public class GenericRepository<TKey, TEntity>(StoreDbContext _context) : IGeneri
         _context.Remove(entity);
     }
 
+    public async Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TKey, TEntity> spec, bool changeTracker = false)
+    {
+        return await ApplySpecifications(spec).ToListAsync();
+    }
+
+    public async Task<TEntity?> GetAsync(ISpecifications<TKey, TEntity> spec, TKey key)
+    {
+        return await ApplySpecifications(spec).FirstOrDefaultAsync();
+    }
+
+    public async Task<int> CountAsync(ISpecifications<TKey, TEntity> spec)
+    {
+        return await ApplySpecifications(spec).CountAsync();
+    }
+
+    private IQueryable<TEntity> ApplySpecifications(ISpecifications<TKey, TEntity> spec)
+    {
+        return SpecificationsEvaluator.GetQuery(_context.Set<TEntity>(), spec);
+    }
 
 }

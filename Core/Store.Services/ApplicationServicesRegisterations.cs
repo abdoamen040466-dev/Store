@@ -4,6 +4,7 @@ using Store.Services.Abstractions;
 using Store.Services.Mapping.Basket;
 using Store.Services.Mapping.Products;
 
+
 namespace Store.Services;
 
 public static class ApplicationServicesRegisterations

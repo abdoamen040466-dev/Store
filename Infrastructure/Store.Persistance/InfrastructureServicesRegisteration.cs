@@ -19,6 +19,7 @@ public static class InfrastructureServicesRegisteration
         services.AddScoped<IDbInitializer, DbInitializer>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IBasketRepository, BasketRepository>();
+        services.AddScoped<ICasheRepository, CasheRepository>();
         services.AddSingleton<IConnectionMultiplexer>((serviceProvider) =>
         ConnectionMultiplexer.Connect(configuration.GetConnectionString("RedisConnection"))
         );

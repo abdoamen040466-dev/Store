@@ -1,4 +1,5 @@
-﻿using Store.Domain.Exceptions.NotFound;
+﻿using Store.Domain.Exceptions.BadRequest;
+using Store.Domain.Exceptions.NotFound;
 using Store.Shared.ErrorModels;
 
 namespace Store.Web.Middlewares;
@@ -29,6 +30,7 @@ public class GlobalErrorHandlingMiddleware
             context.Response.StatusCode = ex switch
             {
                 NotFoundException => StatusCodes.Status404NotFound,
+                BadRequestException => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
 
             };

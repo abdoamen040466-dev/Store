@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Store.Domain.Contracts;
 using Store.Domain.Entities.Products;
-using Store.Domain.Exceptions.NotFound;
+using Store.Services.Abstractions.Common;
 using Store.Services.Abstractions.Products;
 using Store.Services.Specifications.Products;
 using Store.Shared;
@@ -11,7 +11,7 @@ namespace Store.Services.Products;
 
 public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProductService
 {
-    public async Task<PaginationResponse<ProductResponse>> GetAllProductAsync(ProductQueryParameters parameters)
+    public async Task<Result<PaginationResponse<ProductResponse>>> GetAllProductAsync(ProductQueryParameters parameters)
     {
         var spec = new ProductsWithBrandAndTypeSpecifications(parameters);
 
@@ -21,18 +21,20 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
 
         var countSpec = new ProductCountSpecifications(parameters);
         var count = await _unitOfWork.GetRepository<int, Product>().CountAsync(countSpec);
-        return new PaginationResponse<ProductResponse>(parameters.pageIndex, parameters.pageSize, count, productResponse);
+        return Result<PaginationResponse<ProductResponse>>.Ok(new PaginationResponse<ProductResponse>(parameters.pageIndex, parameters.pageSize, count, productResponse));
     }
 
-    public async Task<ProductResponse> GetProductByIdAsync(int id)
+    public async Task<Result<ProductResponse>> GetProductByIdAsync(int id)
     {
         var spec = new ProductsWithBrandAndTypeSpecifications(id);
 
         var product = await _unitOfWork.GetRepository<int, Product>().GetAsync(spec, id);
 
-        if (product is null) throw new ProductNotFoundException(id);
+        if (product is null)
+            return Error.NotFound();
 
         return _mapper.Map<ProductResponse>(product);
+
     }
     public async Task<IEnumerable<BrandTypeResponse>> GetAllBrandsAsync()
     {

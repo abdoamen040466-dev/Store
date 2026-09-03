@@ -6,22 +6,22 @@ namespace Store.Presentation.API;
 
 [ApiController]
 [Route("api/[controller]")]
-public class BasketController(IServiceManager _serviceManager) : ControllerBase
+public class BasketsController(IServiceManager _serviceManager) : ControllerBase
 {
-    [HttpGet("{id}")]
+    [HttpGet]
     public async Task<IActionResult> GetBasketById(string id)
     {
         var result = await _serviceManager.BasketService.GetBasketAsync(id);
         return Ok(result);
     }
 
-    [HttpGet("{id}")]
+    [HttpPost]
     public async Task<IActionResult> CreateOrUpdateBasket(BasketDto dto)
     {
         var result = await _serviceManager.BasketService.CreateBasketAsync(dto, TimeSpan.FromDays(7));
         return Ok(result);
     }
-    [HttpGet("{id}")]
+    [HttpDelete]
     public async Task<IActionResult> DeleteBasket(string id)
     {
         await _serviceManager.BasketService.DeleteBasketAsync(id);

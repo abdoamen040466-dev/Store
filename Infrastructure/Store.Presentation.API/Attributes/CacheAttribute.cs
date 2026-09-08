@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Store.Presentation.API.Attributes;
 
-public class CasheAttribute(int timeInSec) : Attribute, IAsyncActionFilter
+public class CacheAttribute(int timeInSec) : Attribute, IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {

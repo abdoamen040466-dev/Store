@@ -21,14 +21,14 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
 
         var countSpec = new ProductCountSpecifications(parameters);
         var count = await _unitOfWork.GetRepository<int, Product>().CountAsync(countSpec);
-        return Result<PaginationResponse<ProductResponse>>.Ok(new PaginationResponse<ProductResponse>(parameters.pageIndex, parameters.pageSize, count, productResponse));
+        return new PaginationResponse<ProductResponse>(parameters.pageIndex, parameters.pageSize, count, productResponse);
     }
 
     public async Task<Result<ProductResponse>> GetProductByIdAsync(int id)
     {
         var spec = new ProductsWithBrandAndTypeSpecifications(id);
 
-        var product = await _unitOfWork.GetRepository<int, Product>().GetAsync(spec, id);
+        var product = await _unitOfWork.GetRepository<int, Product>().GetAsync(spec);
 
         if (product is null)
             return Error.NotFound();
@@ -36,15 +36,18 @@ public class ProductService(IUnitOfWork _unitOfWork, IMapper _mapper) : IProduct
         return _mapper.Map<ProductResponse>(product);
 
     }
-    public async Task<IEnumerable<BrandTypeResponse>> GetAllBrandsAsync()
+    public async Task<Result<IEnumerable<BrandTypeResponse>>> GetAllBrandsAsync()
     {
         var brands = await _unitOfWork.GetRepository<int, ProductBrand>().GetAllAsync();
-        return _mapper.Map<IEnumerable<BrandTypeResponse>>(brands);
+        var brandsDto = _mapper.Map<IEnumerable<BrandTypeResponse>>(brands);
+        return Result<IEnumerable<BrandTypeResponse>>.Ok(brandsDto);
+
     }
-    public async Task<IEnumerable<BrandTypeResponse>> GetAllTypesAsync()
+    public async Task<Result<IEnumerable<BrandTypeResponse>>> GetAllTypesAsync()
     {
         var types = await _unitOfWork.GetRepository<int, ProductType>().GetAllAsync();
-        return _mapper.Map<IEnumerable<BrandTypeResponse>>(types);
+        var typesDto = _mapper.Map<IEnumerable<BrandTypeResponse>>(types);
+        return Result<IEnumerable<BrandTypeResponse>>.Ok(typesDto);
     }
 
 }

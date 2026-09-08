@@ -4,27 +4,25 @@ using Store.Shared.Dtos.Baskets;
 
 namespace Store.Presentation.API;
 
-[ApiController]
-[Route("api/[controller]")]
-public class BasketsController(IServiceManager _serviceManager) : ControllerBase
+public class BasketsController(IServiceManager _serviceManager) : APIBaseController
 {
-    [HttpGet]
-    public async Task<IActionResult> GetBasketById(string id)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<BasketDto>> GetBasketById(string id)
     {
         var result = await _serviceManager.BasketService.GetBasketAsync(id);
-        return Ok(result);
+        return HandleResult(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateOrUpdateBasket(BasketDto dto)
+    public async Task<ActionResult<BasketDto>> CreateOrUpdateBasket(BasketDto dto)
     {
         var result = await _serviceManager.BasketService.CreateBasketAsync(dto, TimeSpan.FromDays(7));
-        return Ok(result);
+        return HandleResult(result);
     }
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteBasket(string id)
     {
-        await _serviceManager.BasketService.DeleteBasketAsync(id);
-        return NoContent();
+        var result = await _serviceManager.BasketService.DeleteBasketAsync(id);
+        return HandleResult(result);
     }
 }

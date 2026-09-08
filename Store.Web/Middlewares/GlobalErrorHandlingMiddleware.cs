@@ -1,5 +1,6 @@
 ﻿using Store.Domain.Exceptions.BadRequest;
 using Store.Domain.Exceptions.NotFound;
+using Store.Domain.Exceptions.UnAutherized;
 using Store.Shared.ErrorModels;
 
 namespace Store.Web.Middlewares;
@@ -31,6 +32,7 @@ public class GlobalErrorHandlingMiddleware
             {
                 NotFoundException => StatusCodes.Status404NotFound,
                 BadRequestException => StatusCodes.Status400BadRequest,
+                UnAutherizedException => StatusCodes.Status401Unauthorized,
                 _ => StatusCodes.Status500InternalServerError
 
             };

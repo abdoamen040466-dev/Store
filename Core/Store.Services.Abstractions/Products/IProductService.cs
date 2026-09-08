@@ -8,6 +8,6 @@ public interface IProductService
 {
     Task<Result<PaginationResponse<ProductResponse>>> GetAllProductAsync(ProductQueryParameters parameters);
     Task<Result<ProductResponse>> GetProductByIdAsync(int id);
-    Task<IEnumerable<BrandTypeResponse>> GetAllBrandsAsync();
-    Task<IEnumerable<BrandTypeResponse>> GetAllTypesAsync();
+    Task<Result<IEnumerable<BrandTypeResponse>>> GetAllBrandsAsync();
+    Task<Result<IEnumerable<BrandTypeResponse>>> GetAllTypesAsync();
 }

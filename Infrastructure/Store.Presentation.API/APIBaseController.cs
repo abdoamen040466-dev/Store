@@ -52,7 +52,7 @@ public class APIBaseController : ControllerBase
             _ => StatusCodes.Status500InternalServerError
         };
 
-        return base.Problem(
+        return Problem(
                 statusCode: statusCode,
                 title: error.Description,
                 type: error.Code

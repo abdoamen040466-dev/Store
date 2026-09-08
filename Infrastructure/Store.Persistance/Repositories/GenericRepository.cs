@@ -48,7 +48,7 @@ public class GenericRepository<TKey, TEntity>(StoreDbContext _context) : IGeneri
         return await ApplySpecifications(spec).ToListAsync();
     }
 
-    public async Task<TEntity?> GetAsync(ISpecifications<TKey, TEntity> spec, TKey key)
+    public async Task<TEntity?> GetAsync(ISpecifications<TKey, TEntity> spec)
     {
         return await ApplySpecifications(spec).FirstOrDefaultAsync();
     }

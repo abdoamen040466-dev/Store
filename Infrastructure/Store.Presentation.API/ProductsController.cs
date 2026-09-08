@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Store.Presentation.API.Attributes;
 using Store.Services.Abstractions;
@@ -11,7 +12,8 @@ namespace Store.Presentation.API;
 public class ProductsController(IServiceManager _serviceManager) : APIBaseController
 {
     [HttpGet]
-    [Cashe(5 * 60)]
+    [Cache(5 * 60)]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PaginationResponse<ProductResponse>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
@@ -26,9 +28,9 @@ public class ProductsController(IServiceManager _serviceManager) : APIBaseContro
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorDetails))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ErrorDetails))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorDetails))]
-    public async Task<ActionResult<ProductResponse>> GetProductById(int? id)
+    public async Task<ActionResult<ProductResponse>> GetProductById(int id)
     {
-        var result = await _serviceManager.ProductService.GetProductByIdAsync(id.Value);
+        var result = await _serviceManager.ProductService.GetProductByIdAsync(id);
 
         return HandleResult(result);
     }
@@ -41,7 +43,7 @@ public class ProductsController(IServiceManager _serviceManager) : APIBaseContro
     {
         var result = await _serviceManager.ProductService.GetAllBrandsAsync();
         if (result is null) return NotFound();
-        return Ok(result);
+        return HandleResult(result);
     }
 
     [HttpGet("types")]
@@ -52,6 +54,6 @@ public class ProductsController(IServiceManager _serviceManager) : APIBaseContro
     {
         var result = await _serviceManager.ProductService.GetAllTypesAsync();
         if (result is null) return NotFound();
-        return Ok(result);
+        return HandleResult(result);
     }
 }

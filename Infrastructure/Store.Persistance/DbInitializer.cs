@@ -1,12 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Store.Domain.Contracts;
+using Store.Domain.Entities.Identity;
+using Store.Domain.Entities.Orders;
 using Store.Domain.Entities.Products;
 using Store.Persistance.Data.Contexts;
+using Store.Persistance.Identity.Contexts;
 using System.Text.Json;
 
 namespace Store.Persistance;
 
-public class DbInitializer(StoreDbContext _context) : IDbInitializer
+public class DbInitializer(
+    StoreDbContext _context,
+    IdentityStoreDbContext _identityContext,
+    UserManager<AppUser> _userManager,
+    RoleManager<IdentityRole> _roleManager
+    ) : IDbInitializer
 {
 
 
@@ -20,6 +29,26 @@ public class DbInitializer(StoreDbContext _context) : IDbInitializer
         }
 
         // Data seeding
+
+        // Order 
+        if (!_context.DeliveryMethods.Any())
+        {
+            // 1. Read All Data from JSON file 'brand.json'
+            // D:\backend\08 Asp.Net Core Web Apis\Session 02\New folder\Store\Infrastructure\Store.Persistance\Data\DataSeeding\brands.json
+            var DeliveryData = await File.ReadAllTextAsync(@"..\Infrastructure\Store.Persistance\Data\DataSeeding\delivery.json");
+
+
+
+            // 2. Convert the JsonString to List<ProductBrand>
+            var DeliveryMethods = JsonSerializer.Deserialize<List<DeliveryMethod>>(DeliveryData);
+
+            if (DeliveryMethods is not null && DeliveryMethods.Count > 0)
+            {
+                await _context.DeliveryMethods.AddRangeAsync(DeliveryMethods);
+            }
+        }
+
+
         // Product Brands
         if (!_context.ProductBrands.Any())
         {
@@ -75,7 +104,57 @@ public class DbInitializer(StoreDbContext _context) : IDbInitializer
         }
 
 
+
+
         await _context.SaveChangesAsync();
 
     }
+
+    public async Task InitializeIdentityAsync()
+    {
+        // Create DB
+        // Update DB
+        if ((await _identityContext.Database.GetPendingMigrationsAsync()).Any())
+        {
+            await _identityContext.Database.MigrateAsync();
+        }
+
+        // Data Seed
+        if (!_identityContext.Roles.Any())
+        {
+            await _roleManager.CreateAsync(new IdentityRole() { Name = "SuperAdmin" });
+            await _roleManager.CreateAsync(new IdentityRole() { Name = "Admin" });
+        }
+
+        if (!_identityContext.Users.Any())
+        {
+            var superAdmin = new AppUser()
+            {
+                UserName = "SuperAdmin",
+                DisplyName = "Supera Amin",
+                Email = "SuperAdmin@gmail.com",
+                PhoneNumber = "01234567890"
+            };
+            var admin = new AppUser()
+            {
+                UserName = "Admin",
+                DisplyName = "Admin",
+                Email = "Admin@gmail.com",
+                PhoneNumber = "01234567891"
+            };
+            await _userManager.CreateAsync(superAdmin, "SuperAdmin123!");
+            await _userManager.CreateAsync(admin, "Admin123!");
+
+            await _userManager.AddToRoleAsync(superAdmin, "SuperAdmin");
+            await _userManager.AddToRoleAsync(admin, "Admin");
+
+        }
+
+
+
+    }
+
+
+
+
 }
